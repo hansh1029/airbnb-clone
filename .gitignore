@@ -140,4 +140,8 @@ cython_debug/
 # mac
 .DS_Store
 uploads/
+
+#formatter
 .prettierignore
+
+node_modules/
