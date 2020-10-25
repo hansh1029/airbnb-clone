@@ -16,7 +16,7 @@ class HomeView(ListView):
     """ HomeView Definition """
 
     model = models.Room
-    paginate_by = 10
+    paginate_by = 12
     paginate_orphans = 5
     ordering = "created"
     context_object_name = "rooms"
@@ -64,7 +64,7 @@ def room_detail(request, pk):
 
 
 class SearchView(View):
-    def get(self, request):    
+    def get(self, request):
         country = request.GET.get("country")
 
         if country:
@@ -96,7 +96,7 @@ class SearchView(View):
 
                 if price is not None:
                     filter_args["price__lte"] = price
-                
+
                 if guests is not None:
                     filter_args["guests__gte"] = guests
 
@@ -111,7 +111,7 @@ class SearchView(View):
 
                 if instant_book is True:
                     filter_args["instant_book"] = True
-                
+
                 if superhost is True:
                     filter_args["host__superhost"] = True
 
@@ -123,7 +123,7 @@ class SearchView(View):
 
                 qs = models.Room.objects.filter(**filter_args).order_by("-created")
 
-                paginator = Paginator(qs, 10, orphans=5)
+                paginator = Paginator(qs, 12, orphans=5)
 
                 page = request.GET.get("page", 1)
 
@@ -133,7 +133,7 @@ class SearchView(View):
                     request,
                     "rooms/search.html",
                     {"form": form, "rooms": rooms},
-                )                
+                )
 
         else:
             form = forms.SearchForm()

@@ -141,7 +141,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 AUTH_USER_MODEL = "users.User"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "uplads")
+# MEDIA_ROOT = os.path.join(BASE_DIR, "uplads") does now work and don't know why
+MEDIA_ROOT = BASE_DIR / "uploads"
 
 MEDIA_URL = "/media/"
 

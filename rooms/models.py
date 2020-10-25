@@ -109,4 +109,8 @@ class Room(core_models.TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse("rooms:detail", kwargs={"pk": self.pk})
-    
+
+    def first_photo(self):
+        # comma is required to notify we need first element of array to django
+        (photo,) = self.photos.all()[:1]
+        return photo.file.url
