@@ -1,16 +1,19 @@
 import os
 import requests
 from django.views import View
+from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import FormView, DetailView, UpdateView
 from django.shortcuts import render, redirect, reverse
-from django.urls import reverse_lazy
+
+# from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
 from django.contrib import messages
-from . import forms, models
+from django.contrib.messages.views import SuccessMessageMixin
+from . import forms, models, mixins
 
 
-class LoginView(View):
+class LoginView(mixins.LoggedOutOnlyView, View):
     def get(self, request):
         # form = forms.LoginForm(initial={"email": "itn@las.com"})
         form = forms.LoginForm()
@@ -33,15 +36,16 @@ class LoginView(View):
 
 
 def log_out(request):
-    messages.info(request, f"See you later")
+    messages.info(request, "See you later")
     logout(request)
     return redirect(reverse("core:home"))
 
 
-class SignUpView(FormView):
+class SignUpView(mixins.LoggedOutOnlyView, FormView):
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
-    success_url = reverse_lazy("core:home")
+    # reverse_lazy is used for the variable in class
+    # success_url = reverse_lazy("core:home")
     # initial = {
     #     "first_name": "Breaking",
     #     "last_name": "Bad",
@@ -58,6 +62,13 @@ class SignUpView(FormView):
             login(self.request, user)
         user.verify_email()
         return super().form_valid(form)
+
+    def get_success_url(self):
+        next_arg = self.request.GET.get("next")
+        if next_arg is not None:
+            return next_arg
+        else:
+            return reverse("core:home")
 
 
 def complete_verification(request, key):
@@ -225,5 +236,66 @@ class UserProfileView(DetailView):
     #     return super().get_context_data(**kwargs)
 
 
-class UpdateUserView(UpdateView):
-    pass
+class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
+
+    model = models.User
+    template_name = "users/update-profile.html"
+    fields = (
+        # "email",
+        "first_name",
+        "last_name",
+        # "avatar",
+        "gender",
+        "bio",
+        "birthdate",
+        "language",
+        "currency",
+    )
+
+    success_message = "Profile Updated"
+
+    # return the obeject that we want to use
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    # def form_valid(self, form):
+    #     email = form.clean_data.get("email")
+    #     self.object.username = email
+    #     self.object.save()
+    #     return super().form_valid(form)
+
+    # customize form such as adding placeholder in the form
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["first_name"].widget.attrs = {"placeholder": "Frist Name"}
+        form.fields["last_name"].widget.attrs = {"placeholder": "Last Name"}
+        form.fields["gender"].widget.attrs = {"placeholder": "gender"}
+        form.fields["bio"].widget.attrs = {"placeholder": "bio"}
+        form.fields["birthdate"].widget.attrs = {"placeholder": "Brithdate"}
+        form.fields["language"].widget.attrs = {"placeholder": "language"}
+        form.fields["currency"].widget.attrs = {"placeholder": "currency"}
+        return form
+
+
+class UpdatePasswordView(
+    mixins.EmailLoginOnlyView,
+    mixins.LoggedInOnlyView,
+    SuccessMessageMixin,
+    PasswordChangeView,
+):
+
+    template_name = "users/update-password.html"
+    # success_url = reverse_lazy
+    success_message = "Password Updated"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields["old_password"].widget.attrs = {"placeholder": "Current Password"}
+        form.fields["new_password1"].widget.attrs = {"placeholder": "New Password"}
+        form.fields["new_password2"].widget.attrs = {
+            "placeholder": "Confirm New Password"
+        }
+        return form
+
+    def get_success_url(self):
+        return self.request.get_absolute_url()
