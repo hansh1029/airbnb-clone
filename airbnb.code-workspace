@@ -6,7 +6,6 @@
 	],
 	"settings": {
 		"html.format.enable": false,
-		"editor.formatOnSave": true,
 		"tailwindCSS.emmetCompletions": true
 	}
 }
