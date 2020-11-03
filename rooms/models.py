@@ -111,9 +111,12 @@ class Room(core_models.TimeStampedModel):
         return reverse("rooms:detail", kwargs={"pk": self.pk})
 
     def first_photo(self):
-        # comma is required to notify we need first element of array to django
-        (photo,) = self.photos.all()[:1]
-        return photo.file.url
+        try:
+            # comma is required to notify we need first element of array to django
+            (photo,) = self.photos.all()[:1]
+            return photo.file.url
+        except ValueError:
+            return None
 
     def get_next_four_photos(self):
         photos = self.photos.all()[1:5]
