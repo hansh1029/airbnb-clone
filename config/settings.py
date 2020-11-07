@@ -159,3 +159,7 @@ EMAIL_FROM = os.environ.get("MAILGUN_FROM")
 # Auth
 
 LOGIN_URL = "/users/login/"
+
+# Locale
+
+LOCALE_PATH = (BASE_DIR / "locale",)
