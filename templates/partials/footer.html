@@ -6,10 +6,20 @@
         </span>
         <span>&copy; 2020 Nnb Clone. All rights reserved.</span>
     </div>
-    <div class="mt-10 flex">
+<!-- Todo translating part -->
+    <!-- <div class="mt-10 flex">
+        {% get_current_language as LANGUAGE_CODE %}
         <select class="w-1/5 h-8" id="js-lang">
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
+            <option value="en"
+                {% if LANGUAGE_CODE == 'en' %}
+                    selected
+                {% endif %}
+            >English</option>
+            <option value="es"
+                {% if LANGUAGE_CODE == 'es' %}
+                    selected
+                {% endif %}
+            >Spanish</option>
         </select>
-    </div>
+    </div> -->
 </footer>
